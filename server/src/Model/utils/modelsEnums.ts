@@ -14,11 +14,11 @@ export enum term{
     "shifts",
   }
 
-//jobUserSchema  Enum
+//ApplicationSchema  Enum
   export enum jobUserStatus {
-    "pending",
-    "hired",
-    "rejected",
+    PENDING = "pending",
+    HIRED = "hired",
+    REJECTED = "rejected"
   }
   
   //employerJob Enum

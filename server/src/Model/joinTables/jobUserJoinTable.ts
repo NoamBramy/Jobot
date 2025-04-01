@@ -1,15 +1,29 @@
 import { Types, Schema, model } from "mongoose";
 import { jobUserStatus } from "../utils/modelsEnums";
 
-const JobUserSchema = new Schema({
+const ApplicationSchema = new Schema({
 
-  userId: { type: Types.ObjectId, ref: 'User' },
-  employerId: { type: Types.ObjectId, ref: 'Job' },
+  candidateId: { 
+    type: Types.ObjectId,
+     ref: 'User' 
+  },
+  employerId: { 
+    type: Types.ObjectId,
+     ref: 'User' 
+  },
+  jobId: {
+    type: Types.ObjectId,
+    ref: 'Job'
+  },
   messageToEmployer: {
     type: String,
     required: false,
   },
-  status: Object.values(jobUserStatus),
+  status: {
+    type: String,
+    enum: Object.values(jobUserStatus),
+    default: jobUserStatus.PENDING,
+  },
 });
 
-export const JobUserModel = model("jobUser", JobUserSchema);
+export const ApplicationModel = model("jobUser", ApplicationSchema);

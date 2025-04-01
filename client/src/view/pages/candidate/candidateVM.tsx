@@ -1,59 +1,61 @@
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
-import { useDispatch } from "react-redux";
-import { setUser } from "../../../redux/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser, userSelector } from "../../../redux/user/userSlice";
 
+export function useCandidateVM() {
+  const user = useSelector(userSelector);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const dispatch = useDispatch();
+
+  //fetch all user saved jobs -> set them to
+
+  useEffect(() => {
+    if (user._id === "") {
+      fetchUserProfile()
+        .then((data) => {
+          dispatch(
+            setUser({
+              _id: data._id,
+              fullName: data.userName,
+              email: data.email,
+              phoneNumber: data.phoneNumber,
+              password: "",
+              isHiring: data.isHiring,
+              isCandidate: data.isCandidate,
+              CV: data.CV,
+              experienceOfWork: data.experienceOfWork,
+            })
+          );
+          setIsLoggedIn(true);
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+        });
+    } else {
+      setIsLoggedIn(true);
+    }
+  }, [dispatch, user._id]);
+
+  return { isLoggedIn };
+}
 
 export async function fetchUserProfile() {
   try {
     const response = await fetch("http://localhost:3000/api/user/profile", {
       method: "GET",
-      credentials: "include", 
+      credentials: "include",
     });
 
     if (!response.ok) {
+      const { error } = await response.json();
+      console.error("Error fetching user data:", error);
       throw new Error("Failed to fetch user profile");
     }
 
     const data = await response.json();
-    console.log(data)
     return data;
   } catch (error) {
     console.error("Error fetching user data:", error);
-    throw error; 
+    throw error;
   }
-}
-
-
-export function useCandidateVM() {
-  const [showLogin, setShowLogin] = useState(false);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const userCookie = Cookies.get("user");
-
-    if (userCookie) {
-      fetchUserProfile()
-      .then((data) => {
-        dispatch(setUser({
-          fullName: data.userName,
-          email: data.email,
-          phoneNumber: data.phoneNumber,
-          password: '',
-          isHiring: data.isHiring,
-          isCandidate: data.isCandidate,
-          CV: data.CV,
-          experienceOfWork: data.experienceOfWork,
-        }));
-        setShowLogin(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching user data:", error);
-      });
-    } else {
-      setShowLogin(true);
-    }
-  }, [dispatch]); 
-
-  return { showLogin, setShowLogin };
 }
